@@ -1,10 +1,4 @@
-import {
-    ImageList,
-    useTheme, ImageListItem, Stack, Typography
-} from '@mui/material';
-import type {FC} from "react";
-import React, {useContext} from "react";
-
+import { useTheme } from '@mui/material';
 
 function Logo() {
     const theme = useTheme();
