@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, In, IsNull, Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Events } from '../entities/homeass/2024.1.5/Events.js';
 import { EventTypes } from '../entities/homeass/2024.1.5/EventTypes.js';
 import type { ICountStats } from '@dbstats/shared/src/stats/index.js';

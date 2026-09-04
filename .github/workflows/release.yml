@@ -22,7 +22,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -33,7 +33,7 @@ jobs:
             type=semver,pattern={{major}}
             type=raw,value=stable
       - name: Setup Node.JS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24.11.1
           cache: npm

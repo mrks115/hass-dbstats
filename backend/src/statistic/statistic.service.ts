@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, In, IsNull, Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { StatisticsShortTerm } from '../entities/homeass/2024.1.5/StatisticsShortTerm.js';
 import { Statistics } from '../entities/homeass/2024.1.5/Statistics.js';
 import { StatisticsMeta } from '../entities/homeass/2024.1.5/StatisticsMeta.js';
