@@ -72,7 +72,7 @@ const Label: FC<LabelProps> = ({
   ...rest
 }) => {
   return (
-    <LabelWrapper className={'MuiLabel-' + color} {...rest}>
+    <LabelWrapper className={['MuiLabel-' + color, className].filter(Boolean).join(' ')} {...rest}>
       {children}
     </LabelWrapper>
   );

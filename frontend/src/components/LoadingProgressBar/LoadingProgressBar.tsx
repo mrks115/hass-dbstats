@@ -1,5 +1,4 @@
 import type {FC} from "react";
-import * as React from "react";
 import {Box, LinearProgress, Typography} from "@mui/material";
 import {useLoadingProgress} from "../../contexts/LoadingProgressContext";
 

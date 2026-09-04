@@ -2,7 +2,7 @@ import type {IShowAlerts} from "@dbstats/shared/src/stats";
 import type {FC} from "react";
 import { useEffect, useRef} from "react";
 import * as React from "react";
-import {Alert, Card, CardContent} from "@mui/material";
+import {Alert} from "@mui/material";
 import {SuspenseLoaderInline} from "../SuspenseLoader";
 import {useLoadingProgress} from "../../contexts/LoadingProgressContext";
 
@@ -40,6 +40,8 @@ export const AlertSet: FC<AlertSetProps> = ({api}) => {
             .finally(() => progress?.reportDone());
     }
 
+    // Runs once on mount; hasStartedRef makes re-invocation (StrictMode, dep
+    // churn) a no-op, so 'api'/'progress' are intentionally excluded here.
     useEffect(loadStats, []);
     if (errorMessageLoad) {
         return (

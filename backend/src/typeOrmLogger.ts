@@ -24,7 +24,7 @@ export class TypeOrmLoggerContainer implements TypeOrmLogger {
   /**
    * Logs query and parameters used in it.
    */
-  logQuery(query: string, parameters?: unknown[], queryRunner?: QueryRunner) {
+  logQuery(query: string, parameters?: unknown[], _queryRunner?: QueryRunner) {
     if (
       this._options === 'all' ||
       this._options === true ||
@@ -46,7 +46,7 @@ export class TypeOrmLoggerContainer implements TypeOrmLogger {
     error: string,
     query: string,
     parameters?: unknown[],
-    queryRunner?: QueryRunner,
+    _queryRunner?: QueryRunner,
   ) {
     if (
       this._options === 'all' ||
@@ -70,7 +70,7 @@ export class TypeOrmLoggerContainer implements TypeOrmLogger {
     time: number,
     query: string,
     parameters?: unknown[],
-    queryRunner?: QueryRunner,
+    _queryRunner?: QueryRunner,
   ) {
     const sql =
       query +
@@ -84,7 +84,7 @@ export class TypeOrmLoggerContainer implements TypeOrmLogger {
   /**
    * Logs events from the schema build process.
    */
-  logSchemaBuild(message: string, queryRunner?: QueryRunner) {
+  logSchemaBuild(message: string, _queryRunner?: QueryRunner) {
     if (
       this._options === 'all' ||
       (this._options instanceof Array && this._options.indexOf('schema') !== -1)
@@ -96,7 +96,7 @@ export class TypeOrmLoggerContainer implements TypeOrmLogger {
   /**
    * Logs events from the migrations run process.
    */
-  logMigration(message: string, queryRunner?: QueryRunner) {
+  logMigration(message: string, _queryRunner?: QueryRunner) {
     this._logger.log(message);
   }
 
@@ -107,7 +107,7 @@ export class TypeOrmLoggerContainer implements TypeOrmLogger {
   log(
     level: 'log' | 'info' | 'warn',
     message: unknown,
-    queryRunner?: QueryRunner,
+    _queryRunner?: QueryRunner,
   ) {
     switch (level) {
       case 'log':
@@ -147,7 +147,7 @@ export class TypeOrmLoggerContainer implements TypeOrmLogger {
   protected stringifyParams(parameters: unknown[]) {
     try {
       return JSON.stringify(parameters);
-    } catch (error) {
+    } catch {
       // most probably circular objects in parameters
       return parameters;
     }

@@ -150,6 +150,8 @@ export const CountStatsChart: FC<CountStatesChartProps> = ({title, api}) => {
             .finally(() => progress?.reportDone());
     }
 
+    // Runs once on mount; hasStartedRef makes re-invocation (StrictMode, dep
+    // churn) a no-op, so 'api'/'progress' are intentionally excluded here.
     useEffect(loadStats, []);
     if (errorMessageLoad) {
         return (

@@ -37,7 +37,7 @@ export default [{
     },
 
     rules: {
-        "@typescript-eslint/no-unused-vars": "warn",
+        "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
         curly: "error",
         "@typescript-eslint/consistent-type-exports": "error",
         "@typescript-eslint/interface-name-prefix": "off",
