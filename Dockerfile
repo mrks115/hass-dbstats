@@ -1,7 +1,13 @@
-FROM node:24.11.1-alpine
+FROM node:24.11.1-bookworm-slim
 
-# native modules building needs python and it's setuptools
-RUN apk add --no-cache --update python3 make g++ py3-pip py3-setuptools
+# native modules building needs python and build tools as a fallback in case
+# a prebuilt binary isn't available for this platform (better-sqlite3 does
+# not currently ship musl/Alpine prebuilds for Node 24, which used to force
+# a from-source compile here - and that compile crashed with SIGILL when
+# cross-building arm64 under QEMU emulation on GitHub Actions. Debian/glibc
+# has working prebuilt binaries, so this toolchain should now stay unused.)
+RUN apt-get update && apt-get install --no-install-recommends -y python3 make g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create app directory
 WORKDIR /usr/src/app
