@@ -1,39 +1,72 @@
 name: Build
-on: [push]
+
+on:
+  push:
+  workflow_call:
+
 jobs:
-  build-and-test-dbstats:
+  shared:
+    name: Shared
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [24] # both the HA add-on (ghcr.io/home-assistant/base:3.24, apk nodejs-npm)
-        # and the standalone Docker image (node:24-alpine) now run Node 24
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install shared deps
+          node-version: 24
+          cache: npm
+          cache-dependency-path: shared/package-lock.json
+      - name: Install deps
         working-directory: ./shared
         run: npm ci
-      - name: Install backend deps
+      - name: Build
+        working-directory: ./shared
+        run: npm run build
+      - name: Lint
+        working-directory: ./shared
+        run: npm run lint
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install deps
         working-directory: ./backend
         run: npm ci
-      - name: Install frontend deps
-        working-directory: ./frontend
-        run: npm ci
-      - name: build front
-        working-directory: ./frontend
-        run: npm run build
-      - name: build back
+      - name: Build
         working-directory: ./backend
         run: npm run build
-      - name: test backend
+      - name: Test
         working-directory: ./backend
         run: npm run test
-      - name: lint backend
+      - name: Lint
         working-directory: ./backend
         run: npm run lint
-      - name: lint frontend
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install deps
+        working-directory: ./frontend
+        run: npm ci
+      - name: Build
+        working-directory: ./frontend
+        run: npm run build
+      - name: Lint
         working-directory: ./frontend
         run: npm run lint
