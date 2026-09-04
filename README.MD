@@ -1,7 +1,7 @@
 # Ha DBStats
 
 That's a small Node.JS and React app to check database usage.
-You can install it as addon from [this repository](https://github.com/jehy/hass-addons).
+You can install it as addon from [this repository](https://github.com/mrks115/hass-addons).
 
 ## Local development
 Install node version manager, install node 20, and run:
@@ -31,7 +31,7 @@ services:
 
   hass-dbstats:
     container_name: dbstats
-    image: "ghcr.io/jehy/hass-dbstats:latest"
+    image: "ghcr.io/mrks115/hass-dbstats:latest"
     restart: unless-stopped
     ports:
       - "3000:3000"

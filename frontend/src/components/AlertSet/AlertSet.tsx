@@ -1,9 +1,10 @@
 import type {IShowAlerts} from "@dbstats/shared/src/stats";
 import type {FC} from "react";
-import { useEffect} from "react";
+import { useEffect, useRef} from "react";
 import * as React from "react";
 import {Alert, Card, CardContent} from "@mui/material";
 import {SuspenseLoaderInline} from "../SuspenseLoader";
+import {useLoadingProgress} from "../../contexts/LoadingProgressContext";
 
 type AlertSetProps = {
     api: () => Promise<Array< IShowAlerts >>,
@@ -15,9 +16,16 @@ export const AlertSet: FC<AlertSetProps> = ({api}) => {
     const [loading, setLoading] = React.useState(true);
     const [data, setData] = React.useState(null);
     const [errorMessageLoad, setErrorMessageLoad] = React.useState('');
-
+    const progress = useLoadingProgress();
+    // Guards against firing the load twice for the same mount (e.g. React
+    // StrictMode double-invoking effects), which used to double every request.
+    const hasStartedRef = useRef(false);
 
     function loadStats() {
+        if (hasStartedRef.current) {
+            return;
+        }
+        hasStartedRef.current = true;
 
         const fetchData = async () => {
             setLoading(true);
@@ -27,13 +35,12 @@ export const AlertSet: FC<AlertSetProps> = ({api}) => {
         }
         fetchData()
             // make sure to catch any error
-            .catch((err) => setErrorMessageLoad(err.message));
+            .catch((err) => setErrorMessageLoad(err.message))
+            // report progress once the request has settled, success or failure
+            .finally(() => progress?.reportDone());
     }
 
     useEffect(loadStats, []);
-    useEffect(() => {
-        loadStats();
-    }, []);
     if (errorMessageLoad) {
         return (
             <Alert severity="error">{errorMessageLoad}</Alert>)

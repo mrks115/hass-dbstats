@@ -3,7 +3,7 @@ name: PublishDocker
 env:
   REGISTRY: ghcr.io
   #IMAGE_NAME: ${{ github.repository }}
-  IMAGE_NAME: 'jehy/hass-dbstats'
+  IMAGE_NAME: 'mrks115/hass-dbstats'
 
 on:
   release:

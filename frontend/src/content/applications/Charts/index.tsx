@@ -11,11 +11,16 @@ import Container from "@mui/material/Container";
 import Footer from "../../../components/Footer";
 import {CountStatsChart} from "../../../components/Charts/CountStatsChart";
 import {AlertSet} from "../../../components/AlertSet/AlertSet";
+import {LoadingProgressProvider} from "../../../contexts/LoadingProgressContext";
+import {LoadingProgressBar} from "../../../components/LoadingProgressBar/LoadingProgressBar";
 
+// Keep in sync with the number of widgets below that load data via apiClient
+// (each CountStatsChart / AlertSet reports exactly once when it settles).
+const TOTAL_WIDGETS = 9;
 
 function DatabaseStats() {
     return (
-        <>
+        <LoadingProgressProvider total={TOTAL_WIDGETS}>
             <Helmet>
                 <title>Database stats</title>
             </Helmet>
@@ -26,6 +31,7 @@ function DatabaseStats() {
                 />
             </PageTitleWrapper>
             <Container maxWidth="lg">
+                <LoadingProgressBar/>
                 <Grid
                     container
                     direction="row"
@@ -79,7 +85,7 @@ function DatabaseStats() {
                 </Grid>
             </Container>
             <Footer/>
-        </>
+        </LoadingProgressProvider>
     );
 }
 
