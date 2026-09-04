@@ -5,6 +5,9 @@ type LoadingProgressContextValue = {
     completed: number;
     total: number;
     reportDone: () => void;
+    // Zeroes the counter back out so the progress bar can reappear, e.g. when
+    // a global "refresh all" starts re-fetching every widget.
+    reset: () => void;
 };
 
 const LoadingProgressContext = React.createContext<LoadingProgressContextValue | null>(null);
@@ -23,9 +26,13 @@ export const LoadingProgressProvider: FC<ProviderProps> = ({ total, children }) 
         setCompleted((current) => Math.min(current + 1, total));
     }, [total]);
 
+    const reset = React.useCallback(() => {
+        setCompleted(0);
+    }, []);
+
     const value = React.useMemo(
-        () => ({ completed, total, reportDone }),
-        [completed, total, reportDone],
+        () => ({ completed, total, reportDone, reset }),
+        [completed, total, reportDone, reset],
     );
 
     return (
