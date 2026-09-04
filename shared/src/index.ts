@@ -1,1 +1,1 @@
-export * as Stats from './stats/index';
+export type * as Stats from './stats/index';

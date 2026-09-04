@@ -1,4 +1,4 @@
-export interface IShowAlerts{
-    type: 'info' |'warning' | 'error';
-    text: string;
+export interface IShowAlerts {
+  type: 'info' | 'warning' | 'error';
+  text: string;
 }
