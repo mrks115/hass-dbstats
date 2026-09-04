@@ -5,9 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18, 22, 24] # 18 is used in base image
-        # https://github.com/hassio-addons/addon-base-nodejs/blob/main/base/Dockerfile
-        # so we have to run on it or get rid of it
+        node-version: [24] # both the HA add-on (ghcr.io/home-assistant/base:3.24, apk nodejs-npm)
+        # and the standalone Docker image (node:24-alpine) now run Node 24
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
