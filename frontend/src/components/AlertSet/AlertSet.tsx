@@ -3,7 +3,7 @@ import type {FC} from "react";
 import {useEffect, useRef, useSyncExternalStore} from "react";
 import * as React from "react";
 import {Alert, Box, IconButton, Typography} from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
+import {SpinningRefreshIcon} from "../SpinningRefreshIcon";
 import {SuspenseLoaderInline} from "../SuspenseLoader";
 import {useLoadingProgress} from "../../contexts/LoadingProgressContext";
 import {useRefresh} from "../../contexts/RefreshContext";
@@ -106,7 +106,7 @@ export const AlertSet: FC<AlertSetProps> = ({api, cacheKey}) => {
                             disabled={loading}
                             aria-label={t.refreshWidget}
                             title={t.refreshWidget}>
-                    <RefreshIcon fontSize="small"/>
+                    <SpinningRefreshIcon spinning={loading && isActive} pending={loading && !isActive}/>
                 </IconButton>
             </Box>
             {errorMessageLoad && (

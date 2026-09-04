@@ -3,7 +3,7 @@ import {useEffect, useRef, useSyncExternalStore} from "react";
 import * as React from "react";
 import Chart from "react-apexcharts";
 import {Alert, Box, IconButton, Typography} from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
+import {SpinningRefreshIcon} from "../SpinningRefreshIcon";
 import {SuspenseLoaderInline} from "../SuspenseLoader";
 import type {ICountStats} from "@dbstats/shared/src/stats";
 import type {ApexOptions} from "apexcharts";
@@ -137,7 +137,7 @@ export const DonutStatsChart: FC<DonutStatsChartProps> = ({title, api, cacheKey,
                             disabled={loading}
                             aria-label={t.refreshWidget}
                             title={t.refreshWidget}>
-                    <RefreshIcon fontSize="small"/>
+                    <SpinningRefreshIcon spinning={loading && isActive} pending={loading && !isActive}/>
                 </IconButton>
             </Box>
             {errorMessageLoad && (

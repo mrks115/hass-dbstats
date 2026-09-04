@@ -2,7 +2,7 @@ import {
     Card, Grid, CardContent, CardHeader, Slider, Typography, Box,
     ToggleButton, ToggleButtonGroup, Button
 } from '@mui/material';
-import RefreshIcon from "@mui/icons-material/Refresh";
+import {SpinningRefreshIcon} from "../../../components/SpinningRefreshIcon";
 import apiClient from "../../../apiClient";
 import {Helmet} from "react-helmet-async";
 import PageTitleWrapper from "../../../components/PageTitleWrapper";
@@ -71,6 +71,10 @@ function TopBar() {
     const {refreshAll} = useRefresh();
     const progress = useLoadingProgress();
     const {t} = useTranslation();
+    // Spins while any widget is still catching up with the shared progress
+    // counter - true for the initial load too, which is correct: things are
+    // genuinely still loading then as well.
+    const isRefreshing = progress ? progress.completed < progress.total : false;
 
     const handleRefreshAll = () => {
         progress?.reset();
@@ -79,7 +83,8 @@ function TopBar() {
 
     return (
         <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2}}>
-            <Button variant="outlined" size="small" startIcon={<RefreshIcon/>} onClick={handleRefreshAll}>
+            <Button variant="outlined" size="small" startIcon={<SpinningRefreshIcon spinning={isRefreshing}/>}
+                    onClick={handleRefreshAll}>
                 {t.refreshAll}
             </Button>
             <LanguageToggle/>
