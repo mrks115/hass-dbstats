@@ -10,6 +10,8 @@ import configProvider from '../config.js';
 import pkgJson from '../../package.json' with { type: 'json' };
 const { version } = pkgJson;
 
+const badRoundFunction = (num: number) => Math.round(num * 100) / 100;
+
 @Injectable()
 export class SystemService {
   private logger: Logger;
@@ -58,7 +60,7 @@ export class SystemService {
     );
   }
 
-  async getTableSize(): Promise<Array<ICountStats>> {
+  private async getRawTableSizes(): Promise<Array<ICountStats>> {
     //select m.entity_id, count(1) from states s, states_meta m where s.metadata_id=m.metadata_id group by m.entity_id
     const dbType = configProvider().typeOrmConfig.type;
     if (dbType === 'better-sqlite3') {
@@ -93,6 +95,41 @@ ORDER BY (data_length + index_length) DESC;`);
     throw new BadRequestException(
       `Database type ${dbType} not supported yet for this chart`,
     );
+  }
+
+  async getTableSize(): Promise<Array<ICountStats>> {
+    return this.getRawTableSizes();
+  }
+
+  // Buckets every table's size into a handful of recorder concepts, so
+  // "where does my DB size actually come from" is a glance at a donut
+  // rather than scanning a table-by-table list. Tables not recognised
+  // (schema/migration bookkeeping, future recorder tables, etc.) fall into
+  // "Other" rather than being silently dropped.
+  private static readonly TABLE_CATEGORIES: Record<string, string> = {
+    states: 'States',
+    state_attributes: 'States',
+    states_meta: 'States',
+    events: 'Events',
+    event_data: 'Events',
+    event_types: 'Events',
+    statistics: 'Statistics',
+    statistics_short_term: 'Statistics',
+    statistics_meta: 'Statistics',
+    statistics_runs: 'Statistics',
+  };
+
+  async getTableSizeByCategory(): Promise<Array<ICountStats>> {
+    const rawSizes = await this.getRawTableSizes();
+    const byCategory = new Map<string, number>();
+    for (const { type: tableName, cnt } of rawSizes) {
+      const category =
+        SystemService.TABLE_CATEGORIES[tableName.toLowerCase()] ?? 'Other';
+      byCategory.set(category, (byCategory.get(category) ?? 0) + (cnt ?? 0));
+    }
+    return Array.from(byCategory.entries())
+      .map(([type, cnt]) => ({ type, cnt: badRoundFunction(cnt) }))
+      .sort((a, b) => b.cnt - a.cnt);
   }
 
   async getVersion(): Promise<string> {

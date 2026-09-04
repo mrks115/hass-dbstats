@@ -37,6 +37,29 @@ export class StateService {
     return data;
   }
 
+  // Rows written per entity in the last N days - the classic "what's spamming"
+  // my recorder DB" question, as opposed to countStateTypes() below which is an
+  // all-time total. Uses a plain unix-timestamp cutoff (last_updated_ts is a
+  // double precision epoch-seconds column on every supported DB backend), so
+  // this needs no dialect-specific date arithmetic.
+  async countRecentStateWrites(days = 7): Promise<Array<ICountStats>> {
+    const sinceTs = Date.now() / 1000 - days * 24 * 60 * 60;
+    const data = await this.statesRepository
+      .createQueryBuilder('states')
+      .select('states_meta.entity_id type, count(*) cnt')
+      .innerJoin(
+        StatesMeta,
+        'states_meta',
+        'states.metadata_id=states_meta.metadata_id',
+      )
+      .where('states.last_updated_ts >= :sinceTs', { sinceTs })
+      .groupBy('states_meta.entity_id')
+      .orderBy('cnt', 'DESC')
+      .limit(maxRowsInChart)
+      .execute();
+    return data;
+  }
+
   async countAttributesSize(): Promise<Array<ICountStats>> {
     const query = `select attr2entity.entity_id type, sum(length(a.shared_attrs))/1024.0/1024.0 size
 from (select distinct state_attributes.attributes_id, states_meta.entity_id from state_attributes, states, states_meta

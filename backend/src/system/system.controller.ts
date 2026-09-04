@@ -15,6 +15,11 @@ export class SystemController {
     return this.systemService.getTableSize();
   }
 
+  @Get('getTableSizeByCategory')
+  async getTableSizeByCategory() {
+    return this.systemService.getTableSizeByCategory();
+  }
+
   @Get('getDbAlerts')
   async getDbAlerts() {
     return this.systemService.getDbAlerts();

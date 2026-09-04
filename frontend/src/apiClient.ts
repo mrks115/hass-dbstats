@@ -158,6 +158,28 @@ async function getTableSize(): Promise<Array<ICountStats>> {
     return response.json();
 }
 
+async function countRecentStateWrites(): Promise<Array<ICountStats>> {
+
+    const url = `/addon-api/state/countRecentStateWrites`;
+    const response = await fetch(url, {
+        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        headers: getHeaders(),
+    });
+    await checkResponse(response);
+    return response.json();
+}
+
+async function getTableSizeByCategory(): Promise<Array<ICountStats>> {
+
+    const url = `/addon-api/system/getTableSizeByCategory`;
+    const response = await fetch(url, {
+        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        headers: getHeaders(),
+    });
+    await checkResponse(response);
+    return response.json();
+}
+
 async function getDbAlerts(): Promise<Array<IShowAlerts>> {
 
     const url = `/addon-api/system/getDbAlerts`;
@@ -179,6 +201,7 @@ export default {
     states: {
         countStates: ()=>limitMe(countStates),
         countAttributesSize: ()=>limitMe(countAttributesSize),
+        countRecentStateWrites: ()=>limitMe(countRecentStateWrites),
     },
     statistic: {
         countLong: ()=>limitMe(countStatisticLong),
@@ -186,6 +209,7 @@ export default {
     }, system: {
         getTableSize:()=>limitMe(getTableSize),
         getTableRows: ()=>limitMe(getTableRows),
+        getTableSizeByCategory: ()=>limitMe(getTableSizeByCategory),
         getDbAlerts: ()=>limitMe(getDbAlerts),
     }
 }

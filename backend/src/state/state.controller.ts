@@ -14,4 +14,9 @@ export class StateController {
   async countAttributesSize() {
     return this.stateService.countAttributesSize();
   }
+
+  @Get('countRecentStateWrites')
+  async countRecentStateWrites() {
+    return this.stateService.countRecentStateWrites();
+  }
 }
