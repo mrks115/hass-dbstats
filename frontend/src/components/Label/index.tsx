@@ -90,6 +90,6 @@ Label.propTypes = {
     'success',
     'info'
   ])
-};
+} as any;
 
 export default Label;

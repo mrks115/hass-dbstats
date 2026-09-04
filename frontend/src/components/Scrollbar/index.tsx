@@ -41,6 +41,6 @@ const Scrollbar: FC<ScrollbarProps> = ({ className, children, ...rest }) => {
 Scrollbar.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string
-};
+} as any;
 
 export default Scrollbar;

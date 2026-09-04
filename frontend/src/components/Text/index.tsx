@@ -88,6 +88,6 @@ Text.propTypes = {
     'info',
     'black'
   ])
-};
+} as any;
 
 export default Text;
