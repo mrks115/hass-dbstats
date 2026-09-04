@@ -6,7 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { StatisticsMeta } from './StatisticsMeta';
+import { StatisticsMeta } from './StatisticsMeta.js';
+import type { StatisticsMeta as StatisticsMetaType } from './StatisticsMeta.js';
 
 @Index('statistics_short_term_pkey', ['id'], { unique: true })
 @Index(
@@ -74,5 +75,5 @@ export class StatisticsShortTerm {
     { onDelete: 'CASCADE' },
   )
   @JoinColumn([{ name: 'metadata_id', referencedColumnName: 'id' }])
-  metadata: StatisticsMeta;
+  metadata: StatisticsMetaType;
 }

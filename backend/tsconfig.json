@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "NodeNext",
     "resolveJsonModule": true,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
+    "target": "ES2022",
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "../",
@@ -16,8 +16,24 @@
     "composite": true,
     "noUncheckedIndexedAccess": true,
     "paths": {
-      "@dbstats/shared/*": ["../shared/*"]
-    }
+      "@dbstats/shared/*": [
+        "../shared/*"
+      ]
+    },
+    "strict": false,
+    "types": [
+      "jest",
+      "node"
+    ],
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true
   },
-  "include": ["./src", "../shared", "jest.config.ts", "tsconfig.json", "test", "package.json"]
+  "include": [
+    "./src",
+    "../shared",
+    "jest.config.ts",
+    "tsconfig.json",
+    "test",
+    "package.json"
+  ]
 }

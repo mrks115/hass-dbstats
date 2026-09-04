@@ -1,5 +1,9 @@
-import { ConfigService } from './config.service';
+import { ConfigService } from './config.service.js';
 import * as path from 'path';
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe('Config Service', () => {
   it('should find and parse simple connection string', () => {
@@ -73,8 +77,8 @@ describe('Config Service', () => {
     );
     expect(res.data.typeOrmConfig).toEqual(
       expect.objectContaining({
-        type: 'sqlite',
-        flags: 1,
+        type: 'better-sqlite3',
+        readonly: true,
       }),
     );
     expect(res.data.typeOrmConfig.database).toContain('renamed.db');
@@ -85,8 +89,8 @@ describe('Config Service', () => {
     );
     expect(res.data.typeOrmConfig).toEqual(
       expect.objectContaining({
-        type: 'sqlite',
-        flags: 1,
+        type: 'better-sqlite3',
+        readonly: true,
       }),
     );
     expect(res.data.typeOrmConfig.database).toContain('home-assistant_v2.db');

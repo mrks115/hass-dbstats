@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, In, IsNull, Not, Repository } from 'typeorm';
-import { Events } from '../entities/homeass/2024.1.5/Events';
-import { EventTypes } from '../entities/homeass/2024.1.5/EventTypes';
-import type { ICountStats } from '@dbstats/shared/src/stats';
-import { EventData } from '../entities/homeass/2024.1.5/EventData';
-import config from '../config';
+import { Events } from '../entities/homeass/2024.1.5/Events.js';
+import { EventTypes } from '../entities/homeass/2024.1.5/EventTypes.js';
+import type { ICountStats } from '@dbstats/shared/src/stats/index.js';
+import { EventData } from '../entities/homeass/2024.1.5/EventData.js';
+import config from '../config.js';
 
 const { maxRowsInChart } = config();
 @Injectable()

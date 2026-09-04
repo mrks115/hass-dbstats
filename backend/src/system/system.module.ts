@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { SystemController } from './system.controller';
+import { SystemController } from './system.controller.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SystemService } from './system.service';
-import { Statistics } from '../entities/homeass/2024.1.5/Statistics';
-import { StatisticsShortTerm } from '../entities/homeass/2024.1.5/StatisticsShortTerm';
+import { SystemService } from './system.service.js';
+import { Statistics } from '../entities/homeass/2024.1.5/Statistics.js';
+import { StatisticsShortTerm } from '../entities/homeass/2024.1.5/StatisticsShortTerm.js';
 
 @Module({
   imports: [

@@ -1,19 +1,22 @@
-module.exports = {
-  preset: 'ts-jest',
+export default {
+  preset: 'ts-jest/presets/default-esm',
+  extensionsToTreatAsEsm: ['.ts'],
   testEnvironment: 'node',
   moduleNameMapper: {
-    '@dbstats/shared(.*)': '<rootDir>../shared$1',
+    '^@dbstats/shared(.*)\\.js$': '<rootDir>../shared$1',
+    '^@dbstats/shared(.*)$': '<rootDir>../shared$1',
+    // ESM source imports carry an explicit .js extension pointing at the
+    // compiled output; map them back to the sibling .ts source so ts-jest
+    // can transform it directly.
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-  modulePaths: [
-    '<rootDir>',
-    '<rootDir>../shared',
-  ],
+  modulePaths: ['<rootDir>', '<rootDir>../shared'],
   roots: ['<rootDir>'],
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
   testRegex: '.*\\.spec\\.ts$',
   transform: {
-    '^.+\\.(t)s$': 'ts-jest',
+    '^.+\\.tsx?$': ['ts-jest', { useESM: true }],
   },
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',

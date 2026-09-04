@@ -7,8 +7,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { StateAttributes } from './StateAttributes';
-import { StatesMeta } from './StatesMeta';
+import { StateAttributes } from './StateAttributes.js';
+import { StatesMeta } from './StatesMeta.js';
+import type { StateAttributes as StateAttributesType } from './StateAttributes.js';
+import type { StatesMeta as StatesMetaType } from './StatesMeta.js';
 
 @Index('ix_states_attributes_id', ['attributesId'], {})
 @Index('ix_states_context_id_bin', ['contextIdBin'], {})
@@ -89,17 +91,16 @@ export class States {
 
   @ManyToOne(() => StateAttributes, (stateAttributes) => stateAttributes.states)
   @JoinColumn([{ name: 'attributes_id', referencedColumnName: 'attributesId' }])
-  attributes_2: StateAttributes;
+  attributes_2: StateAttributesType;
 
   @ManyToOne(() => StatesMeta, (statesMeta) => statesMeta.states)
   @JoinColumn([{ name: 'metadata_id', referencedColumnName: 'metadataId' }])
-  metadata: StatesMeta;
+  metadata: StatesMetaType;
 
   @ManyToOne(() => States, (states) => states.states)
   @JoinColumn([{ name: 'old_state_id', referencedColumnName: 'stateId' }])
   oldState: this;
 
   @OneToMany(() => States, (states) => states.oldState)
-  // eslint-disable-next-line no-use-before-define
   states: States[];
 }

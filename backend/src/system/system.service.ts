@@ -1,10 +1,14 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import type { ICountStats, IShowAlerts } from '@dbstats/shared/src/stats';
-import { Statistics } from '../entities/homeass/2024.1.5/Statistics';
-import configProvider from '../config';
-import { version } from '../../package.json';
+import type {
+  ICountStats,
+  IShowAlerts,
+} from '@dbstats/shared/src/stats/index.js';
+import { Statistics } from '../entities/homeass/2024.1.5/Statistics.js';
+import configProvider from '../config.js';
+import pkgJson from '../../package.json' with { type: 'json' };
+const { version } = pkgJson;
 
 @Injectable()
 export class SystemService {
@@ -25,7 +29,7 @@ export class SystemService {
   async getTableRows(): Promise<Array<ICountStats>> {
     //select m.entity_id, count(1) from states s, states_meta m where s.metadata_id=m.metadata_id group by m.entity_id
     const dbType = configProvider().typeOrmConfig.type;
-    if (dbType === 'sqlite') {
+    if (dbType === 'better-sqlite3') {
       const tables = await this.getSqliteTables();
       const res = [];
       for (let i = 0; i < tables.length; i++) {
@@ -57,7 +61,7 @@ export class SystemService {
   async getTableSize(): Promise<Array<ICountStats>> {
     //select m.entity_id, count(1) from states s, states_meta m where s.metadata_id=m.metadata_id group by m.entity_id
     const dbType = configProvider().typeOrmConfig.type;
-    if (dbType === 'sqlite') {
+    if (dbType === 'better-sqlite3') {
       const tables = await this.getSqliteTables();
       const res = [];
       for (let i = 0; i < tables.length; i++) {
@@ -93,7 +97,7 @@ ORDER BY (data_length + index_length) DESC;`);
 
   async getVersion(): Promise<string> {
     const dbType = configProvider().typeOrmConfig.type;
-    if (dbType === 'sqlite') {
+    if (dbType === 'better-sqlite3') {
       const data = (await this.repoLong.manager.query(
         `SELECT sqlite_version() as version`,
       )) as Array<{ version: string }>;

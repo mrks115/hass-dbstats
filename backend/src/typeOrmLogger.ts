@@ -1,5 +1,8 @@
-import type { Logger as TypeOrmLogger, QueryRunner } from 'typeorm';
-import type { LoggerOptions as TypeOrmLoggerOptions } from 'typeorm/logger/LoggerOptions';
+import type {
+  Logger as TypeOrmLogger,
+  QueryRunner,
+  LoggerOptions as TypeOrmLoggerOptions,
+} from 'typeorm';
 import { Logger } from '@nestjs/common';
 
 /**

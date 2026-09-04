@@ -5,7 +5,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Events } from './Events';
+import { Events } from './Events.js';
+import type { Events as EventsType } from './Events.js';
 
 @Index('event_data_pkey', ['dataId'], { unique: true })
 @Index('ix_event_data_hash', ['hash'], {})
@@ -21,5 +22,5 @@ export class EventData {
   sharedData: string | null;
 
   @OneToMany(() => Events, (events) => events.data)
-  events: Events[];
+  events: EventsType[];
 }

@@ -1,17 +1,17 @@
 import { join } from 'path';
 import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
 import { ConfigModule } from '@nestjs/config';
-import config from './config';
+import config from './config.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { LogRequestsMiddleware } from './middleware/log-requests-middleware.service';
-import { DatabaseModule } from './database.module';
-import { EventModule } from './event/event.module';
-import { StateModule } from './state/state.module';
-import { StatisticModule } from './statistic/statistic.module';
-import { SystemModule } from './system/system.module';
+import { LogRequestsMiddleware } from './middleware/log-requests-middleware.service.js';
+import { DatabaseModule } from './database.module.js';
+import { EventModule } from './event/event.module.js';
+import { StateModule } from './state/state.module.js';
+import { StatisticModule } from './statistic/statistic.module.js';
+import { SystemModule } from './system/system.module.js';
 
 @Module({
   imports: [

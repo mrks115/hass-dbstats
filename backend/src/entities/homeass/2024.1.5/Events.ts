@@ -6,8 +6,10 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { EventData } from './EventData';
-import { EventTypes } from './EventTypes';
+import { EventData } from './EventData.js';
+import { EventTypes } from './EventTypes.js';
+import type { EventData as EventDataType } from './EventData.js';
+import type { EventTypes as EventTypesType } from './EventTypes.js';
 
 @Index('ix_events_context_id_bin', ['contextIdBin'], {})
 @Index('ix_events_data_id', ['dataId'], {})
@@ -71,9 +73,9 @@ export class Events {
 
   @ManyToOne(() => EventData, (eventData) => eventData.events)
   @JoinColumn([{ name: 'data_id', referencedColumnName: 'dataId' }])
-  data: EventData;
+  data: EventDataType;
 
   @ManyToOne(() => EventTypes, (eventTypes) => eventTypes.events)
   @JoinColumn([{ name: 'event_type_id', referencedColumnName: 'eventTypeId' }])
-  eventType_2: EventTypes;
+  eventType_2: EventTypesType;
 }

@@ -6,7 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { StatisticsMeta } from './StatisticsMeta';
+import { StatisticsMeta } from './StatisticsMeta.js';
+import type { StatisticsMeta as StatisticsMetaType } from './StatisticsMeta.js';
 
 @Index('statistics_pkey', ['id'], { unique: true })
 @Index('ix_statistics_statistic_id_start_ts', ['metadataId', 'startTs'], {
@@ -72,5 +73,5 @@ export class Statistics {
     { onDelete: 'CASCADE' },
   )
   @JoinColumn([{ name: 'metadata_id', referencedColumnName: 'id' }])
-  metadata: StatisticsMeta;
+  metadata: StatisticsMetaType;
 }

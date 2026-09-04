@@ -5,7 +5,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { States } from './States';
+import { States } from './States.js';
+import type { States as StatesType } from './States.js';
 
 @Index('ix_states_meta_entity_id', ['entityId'], { unique: true })
 @Index('states_meta_pkey', ['metadataId'], { unique: true })
@@ -22,5 +23,5 @@ export class StatesMeta {
   entityId: string | null;
 
   @OneToMany(() => States, (states) => states.metadata)
-  states: States[];
+  states: StatesType[];
 }

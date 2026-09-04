@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, In, IsNull, Not, Repository } from 'typeorm';
-import { States } from '../entities/homeass/2024.1.5/States';
-import { StatesMeta } from '../entities/homeass/2024.1.5/StatesMeta';
-import type { ICountStats } from '@dbstats/shared/src/stats';
-import { StateAttributes } from '../entities/homeass/2024.1.5/StateAttributes';
-import config from '../config';
+import { States } from '../entities/homeass/2024.1.5/States.js';
+import { StatesMeta } from '../entities/homeass/2024.1.5/StatesMeta.js';
+import type { ICountStats } from '@dbstats/shared/src/stats/index.js';
+import { StateAttributes } from '../entities/homeass/2024.1.5/StateAttributes.js';
+import config from '../config.js';
 
 const { maxRowsInChart } = config();
 

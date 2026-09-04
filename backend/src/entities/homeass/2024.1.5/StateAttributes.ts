@@ -5,7 +5,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { States } from './States';
+import { States } from './States.js';
+import type { States as StatesType } from './States.js';
 
 @Index('state_attributes_pkey', ['attributesId'], { unique: true })
 @Index('ix_state_attributes_hash', ['hash'], {})
@@ -21,5 +22,5 @@ export class StateAttributes {
   sharedAttrs: string | null;
 
   @OneToMany(() => States, (states) => states.attributes_2)
-  states: States[];
+  states: StatesType[];
 }

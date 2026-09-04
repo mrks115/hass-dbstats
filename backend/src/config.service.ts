@@ -3,11 +3,25 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type { DataSourceOptions } from 'typeorm';
 import { Injectable, Logger } from '@nestjs/common';
-import type { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import type { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions';
-import type { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
 type DBType = DataSourceOptions['type'];
+// Deep imports like 'typeorm/driver/postgres/PostgresDataSourceOptions' are
+// type-only files with no matching .js, which TypeORM's package.json
+// "exports" map (require -> "*.js") can't resolve under ts-jest's stricter
+// module resolution even though plain tsc tolerates it. Derive the same
+// per-driver option types from the already-resolvable DataSourceOptions union.
+type PostgresDataSourceOptions = Extract<
+  DataSourceOptions,
+  { type: 'postgres' }
+>;
+type BetterSqlite3DataSourceOptions = Extract<
+  DataSourceOptions,
+  { type: 'better-sqlite3' }
+>;
+type MysqlDataSourceOptions = Extract<
+  DataSourceOptions,
+  { type: 'mysql' | 'mariadb' }
+>;
 
 export type ConfigData = {
   typeOrmConfig: Partial<DataSourceOptions>;
@@ -123,7 +137,7 @@ postgresql://@/DB_NAME?host=/path/to/dir
       return 'mysql';
     }
     if (dbConnectString.startsWith('sqlite')) {
-      return 'sqlite';
+      return 'better-sqlite3';
     }
     throw new Error(`Unknown database type ${dbConnectString.split(':')[0]}`);
   }
@@ -134,19 +148,17 @@ postgresql://@/DB_NAME?host=/path/to/dir
     const dbType = ConfigService.getDbTypeFromConnectionString(dbConnectString);
     const { env } = process;
     const queryTimeout = parseInt(env.DB_QUERY_TIMEOUT, 10) || 180_000;
-    if (dbType === 'sqlite') {
+    if (dbType === 'better-sqlite3') {
       const database = dbConnectString.split('://')[1];
-      const options: SqliteConnectionOptions = {
-        type: 'sqlite',
+      const options: BetterSqlite3DataSourceOptions = {
+        type: 'better-sqlite3',
         database: database,
-        // https://www.sqlite.org/c3ref/c_open_autoproxy.html
-        // #define SQLITE_OPEN_READONLY         0x00000001  /* Ok for sqlite3_open_v2() */
-        flags: 0x00000001,
+        readonly: true,
       };
       return options;
     }
     if (dbType === 'postgres') {
-      const options: PostgresConnectionOptions = {
+      const options: PostgresDataSourceOptions = {
         type: 'postgres',
         url: `postgresql://${dbConnectString.split('://')[1]}`,
         extra: {
@@ -157,7 +169,7 @@ postgresql://@/DB_NAME?host=/path/to/dir
       return options;
     }
     if (dbType === 'mysql') {
-      const options: MysqlConnectionOptions = {
+      const options: MysqlDataSourceOptions = {
         type: 'mysql',
         url: `mysql://${dbConnectString.split('://')[1]}`,
         extra: {
@@ -246,7 +258,10 @@ postgresql://@/DB_NAME?host=/path/to/dir
     const secretsFileName = path.join(dir, '/secrets.yaml');
     if (fs.existsSync(secretsFileName)) {
       this.logger.log(`found and parsed secrets file`);
-      return YAML.load(fs.readFileSync(secretsFileName, 'utf-8'));
+      return YAML.load(fs.readFileSync(secretsFileName, 'utf-8')) as Record<
+        string,
+        string
+      >;
     }
     this.secretCache[dir] = {};
     let currentDir = dir;

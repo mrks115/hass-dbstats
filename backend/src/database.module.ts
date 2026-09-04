@@ -1,7 +1,11 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
-import config from './config';
-import { TypeOrmLoggerContainer } from './typeOrmLogger';
+import config from './config.js';
+import { TypeOrmLoggerContainer } from './typeOrmLogger.js';
 import { Module } from '@nestjs/common';
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 @Module({
   imports: [
@@ -15,7 +19,6 @@ import { Module } from '@nestjs/common';
       ),
       name: 'homeass',
       maxQueryExecutionTime: 1000,
-      keepConnectionAlive: true,
     }),
   ],
   exports: [TypeOrmModule],

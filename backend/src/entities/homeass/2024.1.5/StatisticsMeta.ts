@@ -5,8 +5,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Statistics } from './Statistics';
-import { StatisticsShortTerm } from './StatisticsShortTerm';
+import { Statistics } from './Statistics.js';
+import { StatisticsShortTerm } from './StatisticsShortTerm.js';
+import type { Statistics as StatisticsType } from './Statistics.js';
+import type { StatisticsShortTerm as StatisticsShortTermType } from './StatisticsShortTerm.js';
 
 @Index('statistics_meta_pkey', ['id'], { unique: true })
 @Index('ix_statistics_meta_statistic_id', ['statisticId'], { unique: true })
@@ -42,11 +44,11 @@ export class StatisticsMeta {
   name: string | null;
 
   @OneToMany(() => Statistics, (statistics) => statistics.metadata)
-  statistics: Statistics[];
+  statistics: StatisticsType[];
 
   @OneToMany(
     () => StatisticsShortTerm,
     (statisticsShortTerm) => statisticsShortTerm.metadata,
   )
-  statisticsShortTerms: StatisticsShortTerm[];
+  statisticsShortTerms: StatisticsShortTermType[];
 }
