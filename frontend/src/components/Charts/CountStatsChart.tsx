@@ -41,10 +41,32 @@ const COMPACT_UNITS: Array<{ value: number, suffix: string }> = [
     {value: 1e3, suffix: 'k'},
 ];
 
+// Byte-magnitude units scale by *advancing through this chain* (MB -> GB ->
+// TB) rather than getting an SI "k"/"M" prefixed onto them - "1500 MB"
+// should read as "1.5 GB", not the nonsensical "1.5k MB".
+const BYTE_UNIT_CHAIN = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+
+function formatByteUnitValue(num: number, unit: string): string {
+    const startIndex = BYTE_UNIT_CHAIN.indexOf(unit);
+    let scaled = num;
+    let unitIndex = startIndex;
+    while (Math.abs(scaled) >= 1000 && unitIndex < BYTE_UNIT_CHAIN.length - 1) {
+        scaled /= 1000;
+        unitIndex++;
+    }
+    const formatted = Number.isInteger(scaled)
+        ? scaled.toString()
+        : scaled.toFixed(unitIndex === startIndex ? 2 : 1).replace(/\.?0+$/, '');
+    return `${formatted} ${BYTE_UNIT_CHAIN[unitIndex]}`;
+}
+
 function compactNumberFormatter(value: string | number, unit = ''): string {
     const num = typeof value === 'string' ? parseFloat(value) : value;
     if (!isFinite(num)) {
         return String(value);
+    }
+    if (BYTE_UNIT_CHAIN.includes(unit)) {
+        return formatByteUnitValue(num, unit);
     }
     const suffix = unit ? ` ${unit}` : '';
     const abs = Math.abs(num);
