@@ -1,7 +1,5 @@
 import type {ICountStats, IShowAlerts} from "@dbstats/shared/src/stats";
 
-import pLimit from 'p-limit';
-
 // Timeout-ish statuses: 408 (client), 504 (gateway timeout), 524 (Cloudflare's
 // own "a connection was established but the origin didn't respond in time").
 // These come back with an HTML error page body, not JSON - handled specially
@@ -192,24 +190,26 @@ async function getDbAlerts(): Promise<Array<IShowAlerts>> {
 }
 
 
-const limitMe = pLimit(1);
+// Concurrency limiting moved to requestQueue.ts, keyed per-widget by
+// cacheKey, so the UI can tell a truly running request apart from one
+// still queued behind it. These exports are the plain, unwrapped calls.
 export default {
     events: {
-        countEventTypes: ()=>limitMe(countEventTypes),
-        countEventsByDomain: ()=>limitMe(countEventsByDomain),
+        countEventTypes,
+        countEventsByDomain,
     },
     states: {
-        countStates: ()=>limitMe(countStates),
-        countAttributesSize: ()=>limitMe(countAttributesSize),
-        countRecentStateWrites: ()=>limitMe(countRecentStateWrites),
+        countStates,
+        countAttributesSize,
+        countRecentStateWrites,
     },
     statistic: {
-        countLong: ()=>limitMe(countStatisticLong),
-        countShort: ()=>limitMe(countStatisticShort)
+        countLong: countStatisticLong,
+        countShort: countStatisticShort
     }, system: {
-        getTableSize:()=>limitMe(getTableSize),
-        getTableRows: ()=>limitMe(getTableRows),
-        getTableSizeByCategory: ()=>limitMe(getTableSizeByCategory),
-        getDbAlerts: ()=>limitMe(getDbAlerts),
+        getTableSize,
+        getTableRows,
+        getTableSizeByCategory,
+        getDbAlerts,
     }
 }

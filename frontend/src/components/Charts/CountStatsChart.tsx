@@ -1,5 +1,5 @@
 import type {FC} from "react";
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useSyncExternalStore} from "react";
 import * as React from "react";
 import Chart from "react-apexcharts";
 import {Alert, Box, IconButton, Typography} from "@mui/material";
@@ -12,20 +12,24 @@ import {useLoadingProgress} from "../../contexts/LoadingProgressContext";
 import {useChartSettings} from "../../contexts/ChartSettingsContext";
 import {useRefresh} from "../../contexts/RefreshContext";
 import {getCached, setCached} from "../../dataCache";
+import {getActiveKey, runQueued, subscribeQueue} from "../../requestQueue";
 import {useTranslation} from "../../i18n";
 
 type CountStatesChartProps = {
     title: string,
     api: () => Promise<Array<ICountStats>>,
     cacheKey: string,
+    // Unit suffix appended to displayed values, e.g. "MB" - without this,
+    // compactNumberFormatter's "k"/"M" abbreviations look like they
+    // contradict a title that already states a unit (e.g. table size in MB
+    // showing a bare "3.9k", which reads as a different, wrong unit).
+    unit?: string,
 }
 
-function thousandFormatter(value: string | number): string {
+function thousandFormatter(value: string | number, unit = ''): string {
     const num = typeof value === 'string' ? parseInt(value, 10) : value;
-    if (num < 1000) {
-        return num.toString();
-    }
-    return num.toLocaleString('en-us');
+    const formatted = num < 1000 ? num.toString() : num.toLocaleString('en-us');
+    return unit ? `${formatted} ${unit}` : formatted;
 }
 
 // Abbreviates large numbers for compact display on the bars themselves,
@@ -37,19 +41,21 @@ const COMPACT_UNITS: Array<{ value: number, suffix: string }> = [
     {value: 1e3, suffix: 'k'},
 ];
 
-function compactNumberFormatter(value: string | number): string {
+function compactNumberFormatter(value: string | number, unit = ''): string {
     const num = typeof value === 'string' ? parseFloat(value) : value;
     if (!isFinite(num)) {
         return String(value);
     }
+    const suffix = unit ? ` ${unit}` : '';
     const abs = Math.abs(num);
     if (abs < 1000) {
-        return Number.isInteger(num) ? num.toString() : num.toFixed(2).replace(/\.?0+$/, '');
+        const formatted = Number.isInteger(num) ? num.toString() : num.toFixed(2).replace(/\.?0+$/, '');
+        return `${formatted}${suffix}`;
     }
-    const unit = COMPACT_UNITS.find((u) => abs >= u.value) ?? COMPACT_UNITS[COMPACT_UNITS.length - 1];
-    const scaled = num / unit.value;
+    const scale = COMPACT_UNITS.find((u) => abs >= u.value) ?? COMPACT_UNITS[COMPACT_UNITS.length - 1];
+    const scaled = num / scale.value;
     const decimals = Math.abs(scaled) < 10 ? 1 : 0;
-    return `${scaled.toFixed(decimals)}${unit.suffix}`;
+    return `${scaled.toFixed(decimals)}${scale.suffix}${suffix}`;
 }
 
 const MONOSPACE_FONT_STACK = '"SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace';
@@ -92,7 +98,7 @@ function selectTopByShare(
     };
 }
 
-function buildChartState(data: Array<ICountStats>, title: string): { options: ApexOptions, series: ApexAxisChartSeries } {
+function buildChartState(data: Array<ICountStats>, title: string, unit: string): { options: ApexOptions, series: ApexAxisChartSeries } {
     return {
         options: {
             colors: colors(data.length),
@@ -110,12 +116,12 @@ function buildChartState(data: Array<ICountStats>, title: string): { options: Ap
                 }
             }, dataLabels: {
                 style: {fontSize: "14"},
-                formatter: compactNumberFormatter,
+                formatter: (value: string | number) => compactNumberFormatter(value, unit),
             },
             tooltip: {
                 y: {
                     // full, exact value on hover so nothing is lost to the abbreviation
-                    formatter: thousandFormatter,
+                    formatter: (value: string | number) => thousandFormatter(value, unit),
                 },
             },
             yaxis: {
@@ -134,7 +140,7 @@ function buildChartState(data: Array<ICountStats>, title: string): { options: Ap
             xaxis: {
                 categories: data.map(item => item.type),
                 labels: {
-                    formatter: compactNumberFormatter,
+                    formatter: (value: string) => compactNumberFormatter(value, unit),
                     trim: false,
                     style: {
                         fontSize: "14",
@@ -151,7 +157,7 @@ function buildChartState(data: Array<ICountStats>, title: string): { options: Ap
     };
 }
 
-export const CountStatsChart: FC<CountStatesChartProps> = ({title, api, cacheKey}) => {
+export const CountStatsChart: FC<CountStatesChartProps> = ({title, api, cacheKey, unit = ''}) => {
 
     const [loading, setLoading] = React.useState(true);
     const [stats, setStats] = React.useState<{ options: ApexOptions, series: ApexAxisChartSeries } | null>(null);
@@ -167,11 +173,14 @@ export const CountStatsChart: FC<CountStatesChartProps> = ({title, api, cacheKey
     // request. Manual/global refreshes bypass this on purpose.
     const hasStartedRef = useRef(false);
     const prevRefreshVersionRef = useRef(refreshVersion);
+    // True only while THIS widget's request is the one actually executing in
+    // the shared, single-concurrency queue - as opposed to merely queued.
+    const isActive = useSyncExternalStore(subscribeQueue, () => getActiveKey() === cacheKey);
 
     function applyData(allData: Array<ICountStats>) {
         const {shown: data, hiddenCount, hiddenShare} = selectTopByShare(allData, cutoffShare);
         setHiddenInfo(hiddenCount > 0 ? {hiddenCount, hiddenShare} : null);
-        setStats(buildChartState(data, title));
+        setStats(buildChartState(data, title, unit));
     }
 
     function runFetch(forceRefresh: boolean, reportProgress: boolean) {
@@ -195,7 +204,7 @@ export const CountStatsChart: FC<CountStatesChartProps> = ({title, api, cacheKey
                     return;
                 }
             }
-            const allData = await api();
+            const allData = await runQueued(cacheKey, api);
             setCached(cacheKey, allData);
             applyData(allData);
             setLastUpdated(Date.now());
@@ -231,7 +240,7 @@ export const CountStatsChart: FC<CountStatesChartProps> = ({title, api, cacheKey
     const handleManualRefresh = () => runFetch(true, false);
 
     if (loading && !stats) {
-        return <SuspenseLoaderInline success={false}></SuspenseLoaderInline>;
+        return <SuspenseLoaderInline success={false} pending={!isActive}></SuspenseLoaderInline>;
     }
     if (errorMessageLoad && !stats) {
         return (

@@ -9,8 +9,6 @@ export type Translations = {
     pageTitle: string;
     heading: string;
     subHeading: string;
-    infoAlertPrefix: string;
-    infoAlertLinkText: string;
     genericStats: string;
     events: string;
     states: string;
@@ -43,8 +41,6 @@ const translations: Record<Language, Translations> = {
         pageTitle: 'Database Stats',
         heading: 'Database Stats',
         subHeading: 'Size and growth of your Home Assistant recorder database',
-        infoAlertPrefix: 'If you are unfamiliar with HA tables, you can read about them',
-        infoAlertLinkText: 'here',
         genericStats: 'Generic database stats',
         events: 'Events',
         states: 'States',
@@ -76,8 +72,6 @@ const translations: Record<Language, Translations> = {
         pageTitle: 'Datenbankstatistiken',
         heading: 'Datenbankstatistiken',
         subHeading: 'Größe und Wachstum deiner Home-Assistant-Recorder-Datenbank',
-        infoAlertPrefix: 'Falls dir die HA-Tabellen nicht geläufig sind, kannst du hier mehr darüber lesen',
-        infoAlertLinkText: 'hier',
         genericStats: 'Allgemeine Datenbankstatistiken',
         events: 'Events',
         states: 'States',

@@ -1,5 +1,5 @@
 import type {FC} from "react";
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useSyncExternalStore} from "react";
 import * as React from "react";
 import Chart from "react-apexcharts";
 import {Alert, Box, IconButton, Typography} from "@mui/material";
@@ -11,6 +11,7 @@ import colors from "./colors";
 import {useLoadingProgress} from "../../contexts/LoadingProgressContext";
 import {useRefresh} from "../../contexts/RefreshContext";
 import {getCached, setCached} from "../../dataCache";
+import {getActiveKey, runQueued, subscribeQueue} from "../../requestQueue";
 import {useTranslation} from "../../i18n";
 
 type DonutStatsChartProps = {
@@ -55,6 +56,7 @@ export const DonutStatsChart: FC<DonutStatsChartProps> = ({title, api, cacheKey,
     // request. Manual/global refreshes bypass this on purpose.
     const hasStartedRef = useRef(false);
     const prevRefreshVersionRef = useRef(refreshVersion);
+    const isActive = useSyncExternalStore(subscribeQueue, () => getActiveKey() === cacheKey);
 
     function applyData(data: Array<ICountStats>) {
         setChartState(buildDonutState(data, title, unit));
@@ -81,7 +83,7 @@ export const DonutStatsChart: FC<DonutStatsChartProps> = ({title, api, cacheKey,
                     return;
                 }
             }
-            const data = await api();
+            const data = await runQueued(cacheKey, api);
             setCached(cacheKey, data);
             applyData(data);
             setLastUpdated(Date.now());
@@ -117,7 +119,7 @@ export const DonutStatsChart: FC<DonutStatsChartProps> = ({title, api, cacheKey,
     const handleManualRefresh = () => runFetch(true, false);
 
     if (loading && !chartState) {
-        return <SuspenseLoaderInline success={false}></SuspenseLoaderInline>;
+        return <SuspenseLoaderInline success={false} pending={!isActive}></SuspenseLoaderInline>;
     }
     if (errorMessageLoad && !chartState) {
         return (

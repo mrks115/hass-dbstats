@@ -1,6 +1,6 @@
 import type {IShowAlerts} from "@dbstats/shared/src/stats";
 import type {FC} from "react";
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useSyncExternalStore} from "react";
 import * as React from "react";
 import {Alert, Box, IconButton, Typography} from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -8,6 +8,7 @@ import {SuspenseLoaderInline} from "../SuspenseLoader";
 import {useLoadingProgress} from "../../contexts/LoadingProgressContext";
 import {useRefresh} from "../../contexts/RefreshContext";
 import {getCached, setCached} from "../../dataCache";
+import {getActiveKey, runQueued, subscribeQueue} from "../../requestQueue";
 import {useTranslation} from "../../i18n";
 
 type AlertSetProps = {
@@ -29,6 +30,7 @@ export const AlertSet: FC<AlertSetProps> = ({api, cacheKey}) => {
     // request. Manual/global refreshes bypass this on purpose.
     const hasStartedRef = useRef(false);
     const prevRefreshVersionRef = useRef(refreshVersion);
+    const isActive = useSyncExternalStore(subscribeQueue, () => getActiveKey() === cacheKey);
 
     function runFetch(forceRefresh: boolean, reportProgress: boolean) {
         setLoading(true);
@@ -51,7 +53,7 @@ export const AlertSet: FC<AlertSetProps> = ({api, cacheKey}) => {
                     return;
                 }
             }
-            const response = await api();
+            const response = await runQueued(cacheKey, api);
             setCached(cacheKey, response);
             setData(response);
             setLastUpdated(Date.now());
@@ -86,7 +88,7 @@ export const AlertSet: FC<AlertSetProps> = ({api, cacheKey}) => {
     const handleManualRefresh = () => runFetch(true, false);
 
     if (loading && !data) {
-        return <SuspenseLoaderInline success={false}></SuspenseLoaderInline>;
+        return <SuspenseLoaderInline success={false} pending={!isActive}></SuspenseLoaderInline>;
     }
     if (errorMessageLoad && !data) {
         return (

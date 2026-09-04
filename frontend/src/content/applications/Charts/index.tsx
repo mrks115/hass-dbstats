@@ -1,5 +1,5 @@
 import {
-    Card, Alert, Grid, CardContent, CardHeader, Link, Slider, Typography, Box,
+    Card, Grid, CardContent, CardHeader, Slider, Typography, Box,
     ToggleButton, ToggleButtonGroup, Button
 } from '@mui/material';
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -114,14 +114,13 @@ function DatabaseStatsContent() {
                         <Card style={{marginTop: 25}}>
                             <CardHeader title={t.genericStats}></CardHeader>
                             <CardContent>
-                                <Alert severity="info">{t.infoAlertPrefix} <Link
-                                    href="https://data.home-assistant.io/docs/data">{t.infoAlertLinkText}</Link></Alert>
                                 <AlertSet api={apiClient.system.getDbAlerts} cacheKey="dbAlerts"></AlertSet>
                                 <CountStatsChart api={apiClient.system.getTableRows}
                                                  cacheKey="tableRows"
                                                  title={t.tableRows}/>
                                 <CountStatsChart api={apiClient.system.getTableSize}
                                                  cacheKey="tableSize"
+                                                 unit="MB"
                                                  title={t.tableSize}/>
                             </CardContent></Card>
                         <Card style={{marginTop: 25}}>
