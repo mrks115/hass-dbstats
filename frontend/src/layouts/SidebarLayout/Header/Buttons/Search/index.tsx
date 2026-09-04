@@ -30,7 +30,7 @@ import FindInPageTwoToneIcon from '@mui/icons-material/FindInPageTwoTone';
 
 import ChevronRightTwoToneIcon from '@mui/icons-material/ChevronRightTwoTone';
 
-const Transition = forwardRef(function Transition(
+const Transition = forwardRef(function TransitionInner(
   props: TransitionProps & { children: ReactElement<any, any> },
   ref: Ref<unknown>
 ) {
