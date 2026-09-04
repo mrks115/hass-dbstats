@@ -31,7 +31,7 @@ services:
 
   hass-dbstats:
     container_name: dbstats
-    image: "ghcr.io/mrks115/hass-dbstats:latest"
+    image: "ghcr.io/mrks115/hass-dbstats:stable"
     restart: unless-stopped
     ports:
       - "3000:3000"
